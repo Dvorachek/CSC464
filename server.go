@@ -5,29 +5,29 @@ import (
 	"time"
 )
 
-func client(name string, to_server chan chan string, done chan<- bool) {
-    response_channel := make(chan string)
+func client(name string, toServer chan chan string, done chan<- bool) {
+    responseChannel := make(chan string)
  
-    to_server <- response_channel
-    response_channel <- name
+    toServer <- responseChannel
+    responseChannel <- name
  
-    fmt.Println(<-response_channel)
+    fmt.Println(<-responseChannel)
  
     done <- true
 }
  
-func worker(client_channel chan string) {
-    name := <-client_channel
+func worker(clientChannel chan string) {
+    name := <-clientChannel
     response := fmt.Sprintf("Worker: Hello %s", name)
  
-    client_channel <- response
+    clientChannel <- response
 }
  
-func server(from_client chan chan string, kill <-chan bool) {
+func server(fromClient chan chan string, kill <-chan bool) {
     for {
         select {
-            case response_channel := <-from_client:
-                go worker(response_channel)
+            case responseChannel := <-fromClient:
+                go worker(responseChannel)
             case <-kill:
                 fmt.Println("Server: terminating.. BYE BYE")
                 return
@@ -37,21 +37,21 @@ func server(from_client chan chan string, kill <-chan bool) {
  
 func main() {
     const max int = 5
-    to_server := make(chan chan string)
-    kill_server := make(chan bool)
+    toServer := make(chan chan string)
+    killServer := make(chan bool)
     done := make(chan bool)
  
-    go server(to_server, kill_server)
+    go server(toServer, killServer)
  
     for i := 0; i < max; i++ {
         name := fmt.Sprintf("%d", i)
-        go client(name, to_server, done)
+        go client(name, toServer, done)
     }
  
     for i := 0; i < max; i++ {
         <-done
     }
  
-    kill_server <- true
+    killServer <- true
     time.Sleep(time.Second)
 }
