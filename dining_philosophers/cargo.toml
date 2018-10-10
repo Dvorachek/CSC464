@@ -1,0 +1,9 @@
+[package]
+
+name = "dining_philosophers"
+version = "0.12.0"
+authors = ["Steve Klabnik <steve@steveklabnik.com>"]
+description = "The classic concurrency problem, in Rust."
+license = "MIT"
+repository = "https://github.com/steveklabnik/dining_philosophers"
+homepage = "https://github.com/steveklabnik/dining_philosophers"
