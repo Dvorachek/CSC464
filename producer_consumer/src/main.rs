@@ -1,5 +1,8 @@
+// https://gist.github.com/krishnaIndia/f037882b11aca172e9f2
+
 use std::sync::{Arc, Mutex, Condvar};
 use std::thread;
+use std::time::Instant;
 
 struct Producer {
         cvar: Arc<(Mutex<bool>, Condvar)>
@@ -18,16 +21,20 @@ impl Producer {
 
     pub fn start(&self) {
         let pair = self.cvar.clone();
+        let start = Instant::now();
         thread::spawn(move || {
-            loop {
+            for _ in 0..1000000 {
                 let &(ref lock, ref cvar) = &*pair;
-                thread::sleep_ms(1000);
+                //thread::sleep_ms(1000);
                 let mut status = lock.lock().unwrap();
                 *status = true;
                 cvar.notify_all();
                 *status = false;
             }
+            
         });
+        let end = Instant::now();
+        println!("Runtime = {:?}", end.duration_since(start));
     }
 }
 
@@ -52,7 +59,7 @@ impl <'a>Consumer<'a> {
                     let mut fetched = lock.lock().unwrap();
                     loop {
                         fetched = cvar.wait(fetched).unwrap();
-                        println!("Recieved {}", name);
+                        //println!("Recieved {}", name);
                     }
                 });
     }
@@ -66,5 +73,5 @@ fn main() {
     p.start();
     c.start();
     c2.start();
-    thread::sleep_ms(11000);
+    thread::sleep_ms(3000)
 }

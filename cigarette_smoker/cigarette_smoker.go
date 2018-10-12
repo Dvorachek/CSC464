@@ -6,8 +6,9 @@ import (
 	"time"
 )
 
-func agent(agent chan bool, tobacco chan bool, match chan bool, paper chan bool) {
-	for {
+func agent(agent chan bool, tobacco chan bool, match chan bool, paper chan bool, done chan bool) {
+	//CHANGE ITERATIONS HERE
+	for i := 0; i < 100000; i++ {
 		<-agent
 		choice := rand.Intn(3)
 		if choice == 0 {
@@ -20,9 +21,8 @@ func agent(agent chan bool, tobacco chan bool, match chan bool, paper chan bool)
 			fmt.Println("Agent places a match and paper on the table.")
 			tobacco <- true
 		}
-
-		time.Sleep(time.Second)
 	}
+	done <- true
 }
 
 func smokerTobacco(agent chan bool, tobacco chan bool) {
@@ -50,17 +50,22 @@ func smokerPaper(agent chan bool, paper chan bool) {
 }
 
 func main() {
+	start := time.Now()
+
 	agentWake := make(chan bool)
 	tobacco := make(chan bool)
 	match := make(chan bool)
 	paper := make(chan bool)
+	done := make(chan bool)
 
 	go smokerTobacco(agentWake, tobacco)
 	go smokerMatch(agentWake, match)
 	go smokerPaper(agentWake, paper)
-	go agent(agentWake, tobacco, match, paper)
+	go agent(agentWake, tobacco, match, paper, done)
 
 	agentWake <- true
 
-	time.Sleep(time.Second * 20)
+	<-done
+
+	fmt.Printf("\nRuntime = %s", time.Since(start))
 }

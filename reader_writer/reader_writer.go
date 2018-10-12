@@ -33,15 +33,19 @@ func countResource(read chan chan int, add chan int, kill chan bool) {
 }
 
 func main() {
+	start := time.Now()
 	read := make(chan chan int)
 	add := make(chan int)
 	kill := make(chan bool)
 
 	go countResource(read, add, kill)
 
-	writer(10, add)
-	reader(read)
+	for i := 0; i < 10000; i++ {
+		writer(10, add)
+		reader(read)
+	}
 
 	kill <- true
+	fmt.Printf("\nRuntime = %s\n", time.Since(start))
 	time.Sleep(time.Second)
 }

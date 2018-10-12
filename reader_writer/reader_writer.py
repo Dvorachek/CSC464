@@ -7,10 +7,7 @@ class Reader(threading.Thread):
         self.Number = Number
     
     def run(self):
-        for i in range(10):
-            self.Number.read()
-
-
+        self.Number.read()
 
 class Writer(threading.Thread):
     def __init__(self, Number):
@@ -18,9 +15,7 @@ class Writer(threading.Thread):
         self.Number = Number
     
     def run(self):
-        for i in range(10):
-
-            self.Number.write(i)
+        self.Number.write(5)
 
 class Number(object):
     def __init__(self, start=99):
@@ -52,22 +47,20 @@ class Number(object):
         
 
 if __name__=='__main__':
-    number = Number()
+    start = time.time()
+    for _ in range(55000):
+        number = Number()
+        reader1 = Reader(number)
+        reader2 = Reader(number)
+        writer = Writer(number)
 
-    reader1 = Reader(number)
-    reader2 = Reader(number)
-    writer = Writer(number)
+        reader1.start()
+        writer.start()
+        reader2.start()
 
-    reader1.start()
+        reader1.join()
+        reader2.join()
+        writer.join()
 
-    writer.start()
-
-    reader2.start()
-
-
-
-    reader1.join()
-    reader2.join()
-    writer.join()
-
+    print("Runtime = {}".format(time.time() - start))
     print('Main terminating')

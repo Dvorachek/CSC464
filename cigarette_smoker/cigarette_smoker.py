@@ -19,6 +19,7 @@ class Tobacco(threading.Thread):
     def __init__(self, Locks):
         threading.Thread.__init__(self)
         self.Locks = Locks
+        self.daemon = True
     
     def run(self):
         while(True):
@@ -32,6 +33,7 @@ class Paper(threading.Thread):
     def __init__(self, Locks):
         threading.Thread.__init__(self)
         self.Locks = Locks
+        self.daemon = True
     
     def run(self):
         while(True):
@@ -45,6 +47,7 @@ class Match(threading.Thread):
     def __init__(self, Locks):
         threading.Thread.__init__(self)
         self.Locks = Locks
+        self.daemon = True
     
     def run(self):
         while(True):
@@ -60,11 +63,11 @@ class Agent(threading.Thread):
         self.Locks = Locks
 
     def run(self):
-        for i in range(10):
+        #CHANGE ITERATIONS HERE
+        for i in range(55000):
             self.Locks.lock.acquire()
 
             rn = random.randrange(0, 3)
-            print(rn)
 
             if rn == 0:
                 print('Agent places tobacco and paper on the table.')
@@ -80,6 +83,8 @@ class Agent(threading.Thread):
 
 
 if __name__=='__main__':
+    start = time.time()
+
     locks = Locks()
     tobacco = Tobacco(locks)
     paper = Paper(locks)
@@ -88,14 +93,10 @@ if __name__=='__main__':
 
     agent.start()
 
-    tobacco.daemon = True
-    paper.daemon = True
-    match.daemon = True
-
     tobacco.start()
     paper.start()
     match.start()
 
     agent.join()
-
+    print("Runtime = {}".format(time.time() - start))
     print('Main terminating')

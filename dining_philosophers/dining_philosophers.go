@@ -9,7 +9,6 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"time"
 )
 
@@ -27,17 +26,17 @@ func makePhilosopher(name string, neighbor *Philosopher) *Philosopher {
 
 func (phil *Philosopher) think() {
 	fmt.Printf("%v is thinking.\n", phil.name)
-	time.Sleep(time.Duration(rand.Int63n(1e9)))
+	//time.Sleep(time.Duration(rand.Int63n(1e9)))
 }
 
 func (phil *Philosopher) eat() {
 	fmt.Printf("%v is eating.\n", phil.name)
-	time.Sleep(time.Duration(rand.Int63n(1e9)))
+	//time.Sleep(time.Duration(rand.Int63n(1e9)))
 }
 
 func (phil *Philosopher) getChopsticks() {
 	timeout := make(chan bool, 1)
-	go func() { time.Sleep(1e9); timeout <- true }()
+	go func() { timeout <- true }()
 	<-phil.chopstick
 	fmt.Printf("%v got his chopstick.\n", phil.name)
 	select {
@@ -66,23 +65,29 @@ func (phil *Philosopher) dine(announce chan *Philosopher) {
 }
 
 func main() {
-	names := []string{"Kant", "Heidegger", "Wittgenstein",
-		"Locke", "Descartes", "Newton", "Hume", "Leibniz"}
-	philosophers := make([]*Philosopher, len(names))
-	var phil *Philosopher
-	for i, name := range names {
-		phil = makePhilosopher(name, phil)
-		philosophers[i] = phil
+	start := time.Now()
+
+	for i := 0; i < 100000; i++ {
+		names := []string{"Kant", "Heidegger", "Wittgenstein",
+			"Locke", "Descartes"} //, "Newton", "Hume", "Leibniz"}
+		philosophers := make([]*Philosopher, len(names))
+		var phil *Philosopher
+		for i, name := range names {
+			phil = makePhilosopher(name, phil)
+			philosophers[i] = phil
+		}
+		philosophers[0].neighbor = phil
+		fmt.Printf("There are %v philosophers sitting at a table.\n", len(philosophers))
+		fmt.Println("They each have one chopstick, and must borrow from their neighbor to eat.")
+		announce := make(chan *Philosopher)
+		for _, phil := range philosophers {
+			go phil.dine(announce)
+		}
+		for i := 0; i < len(names); i++ {
+			phil := <-announce
+			fmt.Printf("%v is done dining.\n", phil.name)
+		}
 	}
-	philosophers[0].neighbor = phil
-	fmt.Printf("There are %v philosophers sitting at a table.\n", len(philosophers))
-	fmt.Println("They each have one chopstick, and must borrow from their neighbor to eat.")
-	announce := make(chan *Philosopher)
-	for _, phil := range philosophers {
-		go phil.dine(announce)
-	}
-	for i := 0; i < len(names); i++ {
-		phil := <-announce
-		fmt.Printf("%v is done dining.\n", phil.name)
-	}
+
+	fmt.Printf("\nRuntime = %s", time.Since(start))
 }

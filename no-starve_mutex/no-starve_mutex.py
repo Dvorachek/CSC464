@@ -1,4 +1,5 @@
 import threading
+import time
 
 class Locks(object):
     def __init__(self):
@@ -9,6 +10,8 @@ class Locks(object):
         self.room2 = 0
         self.t2.acquire()
 
+        self.magic_number = 0
+
 
 class NoStarveThread(threading.Thread):
     def __init__(self, locks, id):
@@ -17,7 +20,7 @@ class NoStarveThread(threading.Thread):
         self.id = id
     
     def run(self):
-        print('this is where the magic starts')
+        #print('this is where the magic starts')
         self.l.mutex.acquire()
         self.l.room1 += 1
         self.l.mutex.release()
@@ -37,7 +40,8 @@ class NoStarveThread(threading.Thread):
         self.l.t2.acquire()
         self.l.room2 -= 1
 
-        print("Thread {} is in the critical section".format(self.id))
+        #print("Thread {} is in the critical section".format(self.id))
+        self.l.magic_number += 1
 
         if self.l.room2 == 0:
             self.l.t1.release()
@@ -46,9 +50,13 @@ class NoStarveThread(threading.Thread):
 
 
 if __name__=='__main__':
-    locks = Locks()
-    threads = [NoStarveThread(locks, id) for id in range(10)]
-    [thread.start() for thread in threads]
-    [thread.join() for thread in threads]
+    iteration = [10000, 100000, 1000000]
+    for it in iteration:
+        start = time.time()
+        locks = Locks()
+        threads = [NoStarveThread(locks, id) for id in range(it)]
+        [thread.start() for thread in threads]
+        [thread.join() for thread in threads]
 
-    print('\nMain exiting')
+        print("\nIterations = {}".format(locks.magic_number))
+        print("Runtime = {}".format(time.time() - start))

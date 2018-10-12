@@ -12,7 +12,7 @@ func locks(checkMagicNumber chan bool, increment chan bool) {
 		case <-increment:
 			magicNumber++
 		case <-checkMagicNumber:
-			fmt.Printf("Magic number = %d", magicNumber)
+			fmt.Printf("Iterations = %d", magicNumber)
 			return
 		}
 	}
@@ -24,7 +24,9 @@ func noStarveThread(increment chan bool, done chan bool) {
 }
 
 func main() {
-	const max int = 10
+	start := time.Now()
+
+	const max int = 100000
 	checkMagicNumber := make(chan bool)
 	increment := make(chan bool)
 	done := make(chan bool)
@@ -40,5 +42,7 @@ func main() {
 	}
 
 	checkMagicNumber <- true
+
+	fmt.Printf("\nRuntime = %s\n", time.Since(start))
 	time.Sleep(time.Second)
 }

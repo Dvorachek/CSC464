@@ -1,4 +1,5 @@
 import threading
+import time
 
 class Locks(object):
     def __init__(self):
@@ -43,12 +44,20 @@ class Server(threading.Thread):
 
     
 if __name__=='__main__':
-    locks = Locks()
-    server = Server(locks)
-    server.start()
+    iteration = [10000, 100000, 1000000]
+    times = list()
+    for it in iteration:
+        start = time.time()
+        locks = Locks()
+        server = Server(locks)
+        server.start()
 
-    clients = [Client(locks, id, server) for id in range(5)]
-    [client.start() for client in clients]
-    [client.join() for client in clients]
-    
+        clients = [Client(locks, id, server) for id in range(it)]
+        [client.start() for client in clients]
+        [client.join() for client in clients]
+
+        #print("Runtime = {}".format(time.time() - start))
+        times.append(time.time()-start)
+    [print(time) for time in times]
+
     print('\nMain exiting')

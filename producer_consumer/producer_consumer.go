@@ -5,38 +5,34 @@ import (
 	"time"
 )
 
-func producer(max int, talk chan string) {
-	for i := 0; i < max; i++ {
-		message := fmt.Sprintf("%d", i)
-		talk <- message
-		time.Sleep(time.Second)
+func producer(talk chan bool, done chan bool) {
+	for i := 0; i < 1000000; i++ {
+		talk <- true
 	}
+	done <- true
 }
 
-func consumer(killCon chan bool, talk chan string) {
+func consumer(killCon chan bool, talk chan bool) {
+	magicNumber := 0
 	for {
 		select {
 		case <-killCon:
-			fmt.Println("good bye")
+			fmt.Printf("Magic Number = %d", magicNumber)
 			return
-		case message := <-talk:
-			fmt.Println(message)
+		case <-talk:
+			magicNumber++
 		}
 	}
 }
 
 func main() {
+	start := time.Now()
 	killCon := make(chan bool)
-	talk := make(chan string)
-
-	go producer(10, talk)
-	go producer(10, talk)
-	go producer(10, talk)
-
+	talk := make(chan bool)
+	done := make(chan bool)
+	go producer(talk, done)
 	go consumer(killCon, talk)
-
-	time.Sleep(time.Second * 8)
+	<-done
 	killCon <- true
-	time.Sleep(time.Second)
-
+	fmt.Printf("\nRuntime = %s", time.Since(start))
 }
