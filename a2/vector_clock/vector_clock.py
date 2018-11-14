@@ -1,3 +1,6 @@
+import sys
+
+
 class vector_clock(object):
     def __init__(self, id):
         self.id = id
@@ -23,23 +26,45 @@ class vector_clock(object):
         print(self.id, self.clocks)
 
 
-if __name__=="__main__":
-    # init 5 vector clocks for each process
-    vcs = [vector_clock("P{}".format(id)) for id in range(1, 6)]
-    
-    # print vector clocks
+def print_results(ids, expected_results, vcs):
+    print("Test results for {}".format(sys._getframe(1).f_code.co_name))
+    print("Vector clocks ('id', {clock}):")
     [vc.print_clock() for vc in vcs]
+    for i in range(len(vcs)):
+        print("{}: expected result: {}; actual result: {}".format(ids[i], expected_results[i], vcs[i].clocks[ids[i]]))
     print('='*50)
-    
-    vcs[2].send(vcs[1])
-    vcs[1].send(vcs[0])
-    vcs[1].send(vcs[2])
+
+def test_1():
+    # init 4 vector clocks
+    ids = ["P{}".format(id) for id in range(3)]
+    vcs = [vector_clock(id) for id in ids]
+    expected_results = [4, 5, 5]  # from following operations
+
+    vcs[2].send(vcs[1])  # P2 sends to P1
+    vcs[1].send(vcs[0])  # P1 sends to P0
+    vcs[1].send(vcs[2])  # P1 sends to P2
+    vcs[0].send(vcs[1])  # P0 sends to P1
+    vcs[2].send(vcs[0])  # P2 sends to P0
+    vcs[1].send(vcs[2])  # P1 sends to P2
+    vcs[2].send(vcs[0])  # P2 sends to P0
+
+    print_results(ids, expected_results, vcs)
+
+def test_2():
+    ids = ["P{}".format(id) for id in range(4)]
+    vcs = [vector_clock(id) for id in ids]
+    expected_results = [3, 10, 9, 2]
+
+    vcs[1].send(vcs[0])  
+    [vcs[1].do_work() for _ in range(8)]
+    [vcs[2].do_work() for _ in range(8)]
+    vcs[2].send(vcs[3])
+    vcs[3].send(vcs[0])
     vcs[0].send(vcs[1])
-    vcs[2].send(vcs[0])
-    vcs[1].send(vcs[2])
-    vcs[2].send(vcs[0])
 
-    # print vector clocks
-    [vc.print_clock() for vc in vcs]
-    print('='*50)
+    print_results(ids, expected_results, vcs)
 
+
+if __name__=="__main__":
+    test_1()
+    test_2()
