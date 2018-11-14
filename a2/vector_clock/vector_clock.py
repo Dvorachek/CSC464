@@ -1,14 +1,3 @@
-import threading
-
-
-class process(threading.Thread):
-    def __init__(self, vc):
-        self.vc = vc
-
-    def run(self):
-        print 'do something'
-
-
 class vector_clock(object):
     def __init__(self, id):
         self.id = id
