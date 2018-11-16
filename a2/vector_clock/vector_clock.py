@@ -35,7 +35,7 @@ def print_results(ids, expected_results, vcs):
     print('='*50)
 
 def test_1():
-    # init 4 vector clocks
+    # init 3 vector clocks
     ids = ["P{}".format(id) for id in range(3)]
     vcs = [vector_clock(id) for id in ids]
     expected_results = [4, 5, 5]  # from following operations
