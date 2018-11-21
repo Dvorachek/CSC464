@@ -1,0 +1,6 @@
+[package]
+name = "distribution_server"
+version = "0.1.0"
+authors = ["Dylan <dylan.dvorachek@gmail.com>"]
+
+[dependencies]
