@@ -4,8 +4,15 @@ use std::time::Duration;
 extern crate distribution_server;
 use distribution_server::ThreadPool;
 
-fn main() {
+pub fn letscount() {
+    for i in 1..10 {
+        //println!("test {}", i);
+        thread::sleep(Duration::from_millis(1));
+    }
+}
 
+fn main() {
+    /*
     let vector = vec![1, 2, 3];
 
     thread::spawn( move || {
@@ -25,7 +32,12 @@ fn main() {
         println!("number {} from the main thread", i);
         thread::sleep(Duration::from_millis(2));
     }
+    */
 
+    let threadpool = ThreadPool::new(4);
 
+    threadpool.execute(|| {
+        letscount();
+    });
     //handle.join().unwrap();
 }
