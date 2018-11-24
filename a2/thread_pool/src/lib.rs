@@ -4,29 +4,24 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 
-pub struct ThreadPool {
-    workers: Vec<Worker>,
-    sender: mpsc::Sender<Job>,
-}
-
-struct Worker {
-    id: usize,
-    thread: thread::JoinHandle<()>,
-}
-
 trait FnBox {
     fn call_box(self: Box<Self>);
 }
 
 impl<F: FnOnce()> FnBox for F {
     fn call_box(self: Box<F>) {
-        //println!("test1");
-        //println!("test2");
         (*self)()
     }
 }
 
+
 type Job = Box<dyn FnBox + Send + 'static>;
+
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Job>,
+}
 
 impl ThreadPool {
     pub fn execute<F>(&self, f: F)
@@ -49,7 +44,6 @@ impl ThreadPool {
 
         for id in 0..size {
             workers.push(Worker::new(id, Arc::clone(&receiver)));
-            // create some threads and store them in the vector
         }
 
         ThreadPool {
@@ -57,6 +51,12 @@ impl ThreadPool {
             sender,
         }
     }
+}
+
+
+struct Worker {
+    id: usize,
+    thread: thread::JoinHandle<()>,
 }
 
 impl Worker {
