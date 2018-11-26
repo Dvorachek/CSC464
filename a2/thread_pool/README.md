@@ -6,4 +6,51 @@ src/lib.rs contains the code for the thread_pool library.
 
 src/bin/main.rs is used to demonstrate the library's usage.
 
-
+### Sample output from main.rs:
+    Worker 0 got job, executing
+    testing console from within worker
+    test 1
+    test 2
+    test 3
+    Worker 0 got job, executing
+    testing wait
+    Worker 3 got job, executing
+    testing console from within worker
+    test 1
+    test 2
+    test 3
+    Worker 1 got job, executing
+    testing return values: 9.3
+    Worker 4 got job, executing
+    testing return values: 9.3
+    Worker 2 got job, executing
+    testing wait
+    Worker 3 got job, executing
+    testing console from within worker
+    test 1
+    test 2
+    test 3
+    Worker 4 got job, executing
+    testing wait
+    Worker 3 got job, executing
+    testing console from within worker
+    test 1
+    test 2
+    test 3
+    Worker 1 got job, executing
+    testing return values: 9.3
+    Worker 1 got job, executing
+    testing wait
+    Worker 3 got job, executing
+    testing return values: 9.3
+    Worker 3 got job, executing
+    testing console from within worker
+    test 1
+    test 2
+    test 3
+    Worker 3 got job, executing
+    testing return values: 9.3
+    Worker 3 got job, executing
+    testing wait
+    wait done!
+    wait done!
