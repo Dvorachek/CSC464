@@ -14,7 +14,7 @@ fn main() {
         });
 
         pool.execute(|| {
-            println!("{}", add(3.9, 5.4));
+            println!("testing return values: {}", add(3.9, 5.4));
         });
         
         pool.execute(|| {
@@ -24,18 +24,20 @@ fn main() {
 }
 
 fn letscount() {
-    for i in 1..10 {
+    println!("testing console from within worker");
+    for i in 1..4 {
         println!("test {}", i);
     }
 }
 
 fn add(a: f64, b: f64) -> f64 {
-    let mut sum = a + b;
+    let sum = a + b;
 
     sum
 }
 
 fn wait() {
+    println!("testing wait");
     thread::sleep(Duration::from_secs(4));
     println!("wait done!");
 }
